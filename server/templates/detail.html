@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="{{ url_for('static', filename='echarts.min.js') }}"></script>
+</head>
+
+<body>
+<h2>{{ card.ip }}[{{ card.id }}]</h2>
+<div>UUID: {{ card.uuid }}</div>
+<br>
+<div id="box" style="width: 1000px; height:500px; background-color: pink;"></div>
+<script>
+    let myChart = echarts.init(document.getElementById("box"));
+
+    // option 里面的内容基本涵盖你要画的图表的所有内容
+    // 定义样式和数据
+    let option = {
+        // 给echarts图设置背景色
+        backgroundColor: '#FBFBFB',                  // -----------> // 给echarts图设置背景色
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data: ['gpu_util', 'memory_util']
+        },
+
+        calculable: true,
+
+
+        xAxis: [{
+            name: '小时前',
+            nameGap: 10, //刻度与Y轴线名字之间的距离
+            // boundaryGap: false,
+            data: function () {
+                let list = {{ time }};
+                return list;
+            }()
+        }],
+        yAxis: [{
+            name: '平均占用率',
+            type: 'value'
+        }],
+        series: [{
+            name: 'gpu_util',
+            type: 'line',
+            data: {{ gpu_util }}
+        }, {
+            name: 'memory_util',
+            type: 'line',
+            data: {{ memory_util }}
+        }]
+    };
+
+
+    // 一定不要忘了这个，具体是干啥的我忘了，官网是这样写的使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>显卡监控</title>
+</head>
+<body>
+
+<div style="float: left">
+<h2>显卡监控网页</h2>
+<div style="font-size: small;"><b style="color: blue">蓝色</b>为近期使用的机器；<b style="color: red">红色</b>为正在使用的机器</div>
+<br>
+{% for each in servers %}
+    {% if each["state"]==2  %}
+    <div style="font-size: 14px;">
+        <b style="font-size: 20px;color:orange">{{ each["ip"] }} [Offline]</b>
+    {% elif each["state"]==1  %}
+    <div style="font-size: 14px;">
+        <b style="font-size: 20px">{{ each["ip"] }} </b>Last updated: <b style="color:orange">  {{ each["last_updated"] }}</b>
+    {% else %}
+    <div style="font-size: 14px;">
+	<b style="font-size: 20px">{{ each["ip"] }}</b> Last updated: {{ each["last_updated"] }}
+    {% endif %}
+    </div>
+    <table border="1">
+        <tr>
+            <td style="width: 30px">id</td>
+            <td style="width: 80px">gpu_util</td>
+            <td style="width: 80px">memory_util</td>
+            <td style="width: 80px">gpu_temp</td>
+            <td style="width: 80px">fan_speed</td>
+            <td style="width: 80px">unused_time</td>
+            <td style="width: 80px">username</td>
+            <td style="width: 80px">detail/book</td>
+        </tr>
+        {% for uuid in each["cards"] %}
+            {% if last[uuid] == "in use" %}
+                <tr style="color: red">
+                    {% elif last[uuid] == ">8h" or last[uuid] == "--" %}
+                <tr>
+                    {% else %}
+                <tr style="color: blue">
+            {% endif %}
+                    <td>{{ cards[uuid].id }}</td>
+                    <td>{{ cards[uuid].gpu_util }}%</td>
+                    <td>{{ cards[uuid].memory_util }}%</td>
+                    <td>{{ cards[uuid].gpu_temp }}℃</td>
+                    <td>{{ cards[uuid].fan_speed }}%</td>
+                    <td>{{ last[uuid] }}</td>
+                    <td>{{ cards[uuid].username }}</td>
+                    <td><a href="{{ url_for('.detail',uuid=uuid) }}">detail</a>
+                        <input type="checkbox" id="{{ uuid }}" class="checkbox"></td>
+                </tr>
+        {% endfor %}
+    </table>
+    <br>
+
+{% endfor %}
+<hr>
+<div>Ops by ynzheng</div>
+
+</div>
+
+<div style="float: left;width: 100px"><br><br><br><br></div>
+<div style="float: left">
+<h2>每日榜</h2>
+    <p>自从{{last_updated}}</p>
+<table style="border:3px #cccccc solid;" cellpadding="10" border='1'>
+    <tr>
+        <td>用户名</td>
+        <td>小时×卡数</td>
+    </tr>
+    {% for each in recent %}
+    <tr>
+        <td>{{each[0]}}</td>
+        <td>{{each[1]}}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h2>累计榜</h2>
+<table style="border:3px #cccccc solid;" cellpadding="10" border='1'>
+    <tr>
+        <td>用户名</td>
+        <td>小时×卡数</td>
+    </tr>
+    {% for each in total %}
+    <tr>
+        <td>{{each[0]}}</td>
+        <td>{{each[1]}}</td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+</body>
+
+</html>
